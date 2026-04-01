@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Ranzan Garden × Barney</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#1e1a16;--soil:#4a3728;--bark:#7a5c44;--moss:#4a6741;--sage:#7a9e7e;
+  --tender:#b8d4b0;--cream:#f7f1e6;--parchment:#ede4cf;--warm:#e8dcc8;
+  --harvest:#c4833a;--sky:#6a9fb5;--alert:#c0392b;
+  --border:rgba(74,55,40,0.14);--shadow:rgba(30,16,8,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Kaku Gothic New',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+header{background:linear-gradient(160deg,#2e1f14,#4a3728 60%,#5a4535);padding:18px 20px 14px;position:sticky;top:0;z-index:200;box-shadow:0 3px 16px rgba(0,0,0,0.25);}
+.header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.logo-en{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:600;color:var(--cream);letter-spacing:0.06em;line-height:1;}
+.logo-sub{font-size:0.65rem;color:var(--tender);letter-spacing:0.2em;margin-top:4px;font-weight:300;}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.today-str{font-size:0.72rem;color:var(--tender);}
+.alert-banner{background:var(--alert);color:white;font-size:0.7rem;padding:3px 10px;border-radius:12px;display:flex;align-items:center;gap:5px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.75}}
+.tab-bar{background:var(--parchment);border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-inner{max-width:960px;margin:0 auto;display:flex;}
+.tab{padding:12px 16px;font-size:0.78rem;font-weight:500;color:var(--bark);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all 0.2s;}
+.tab:hover{color:var(--moss);}
+.tab.active{color:var(--moss);border-bottom-color:var(--moss);font-weight:700;}
+.main{max-width:960px;margin:0 auto;padding:22px 16px 90px;}
+.view{display:none;}.view.active{display:block;}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--soil);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;letter-spacing:0.04em;}
+.card{background:white;border-radius:14px;border:1px solid var(--border);box-shadow:0 2px 10px var(--shadow);padding:16px;margin-bottom:12px;}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:22px;}
+.stat-card{background:white;border-radius:14px;border:1px solid var(--border);padding:14px 12px;text-align:center;box-shadow:0 2px 8px var(--shadow);}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--soil);font-weight:600;line-height:1;}
+.stat-lbl{font-size:0.7rem;color:var(--bark);margin-top:4px;}
+.alert-card{background:linear-gradient(135deg,#fff5f5,#fff);border:1.5px solid rgba(192,57,43,0.3);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;}
+.alert-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+.alert-body{flex:1;}
+.alert-title{font-size:0.9rem;font-weight:700;color:var(--alert);margin-bottom:3px;}
+.alert-desc{font-size:0.78rem;color:#666;line-height:1.6;}
+.ok-card{background:linear-gradient(135deg,#f0faf0,#fff);border:1.5px solid rgba(74,103,65,0.2);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.upcoming-item{background:white;border-radius:10px;padding:11px 14px;border:1px solid var(--border);margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.upcoming-icon{font-size:1.1rem;width:32px;height:32px;border-radius:8px;background:var(--parchment);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.upcoming-text{flex:1;}
+.upcoming-title{font-size:0.85rem;color:var(--ink);font-weight:500;}
+.upcoming-sub{font-size:0.72rem;color:var(--bark);margin-top:1px;}
+.days-badge{font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;}
+.overdue{background:rgba(192,57,43,0.12);color:var(--alert);}
+.soon{background:rgba(196,131,58,0.15);color:var(--harvest);}
+.ok-badge{background:rgba(74,103,65,0.12);color:var(--moss);}
+.add-btn{background:var(--moss);color:white;border:none;padding:10px 22px;border-radius:10px;font-size:0.85rem;font-family:inherit;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px;transition:all 0.2s;}
+.add-btn:hover{background:#3d6b45;transform:translateY(-1px);}
+.add-form{background:white;border-radius:16px;padding:20px;border:1px solid var(--border);margin-bottom:20px;box-shadow:0 4px 16px var(--shadow);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-row.triple{grid-template-columns:1fr 1fr 1fr;}
+.form-row.single{grid-template-columns:1fr;}
+label{display:block;font-size:0.72rem;color:var(--bark);margin-bottom:4px;font-weight:500;}
+select,input[type=text],input[type=date],textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.87rem;font-family:inherit;color:var(--ink);background:var(--cream);transition:border-color 0.2s;outline:none;}
+select:focus,input:focus,textarea:focus{border-color:var(--sage);background:white;}
+textarea{resize:vertical;min-height:65px;}
+input[type=file]{width:100%;font-size:0.82rem;color:var(--bark);}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;}
+.btn-primary{background:var(--moss);color:white;border:none;padding:10px 24px;border-radius:10px;font-size:0.88rem;font-family:inherit;font-weight:700;cursor:pointer;}
+.btn-primary:hover{background:#3d6b45;}
+.btn-cancel{background:var(--parchment);color:var(--bark);border:1px solid var(--border);padding:10px 18px;border-radius:10px;font-size:0.85rem;font-family:inherit;cursor:pointer;}
+.filter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.chip{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);background:white;font-size:0.76rem;cursor:pointer;color:var(--bark);transition:all 0.15s;font-family:inherit;}
+.chip.active{background:var(--soil);color:white;border-color:var(--soil);}
+.rec-card{background:white;border-radius:14px;padding:13px 15px;border:1px solid var(--border);margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 2px 8px var(--shadow);position:relative;}
+.rec-icon-wrap{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;background:var(--parchment);}
+.rec-body{flex:1;min-width:0;}
+.rec-meta{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap;}
+.type-badge{font-size:0.64rem;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.04em;white-space:nowrap;}
+.rec-plant{font-size:0.8rem;color:var(--soil);font-weight:600;}
+.rec-date{font-size:0.7rem;color:var(--bark);margin-left:auto;}
+.rec-note{font-size:0.82rem;color:var(--ink);line-height:1.55;}
+.rec-next{font-size:0.72rem;color:var(--sage);margin-top:4px;}
+.rec-photo{width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;flex-shrink:0;}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--border);font-size:1rem;padding:2px;transition:color 0.2s;}
+.del-btn:hover{color:var(--alert);}
+.t-fertilizer{background:rgba(196,131,58,0.14);color:#a06820;}
+.t-planting{background:rgba(74,103,65,0.14);color:var(--moss);}
+.t-harvest{background:rgba(106,159,181,0.18);color:var(--sky);}
+.t-water{background:rgba(74,55,40,0.1);color:var(--bark);}
+.t-spray{background:rgba(192,57,43,0.12);color:var(--alert);}
+.t-lawn{background:rgba(61,107,69,0.14);color:#3d6b45;}
+.t-photo{background:rgba(122,158,126,0.15);color:var(--sage);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-nav{background:white;border:1px solid var(--border);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.9rem;color:var(--soil);display:flex;align-items:center;justify-content:center;}
+.cal-month{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--soil);font-weight:600;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:18px;}
+.cal-dn{text-align:center;font-size:0.68rem;color:var(--bark);padding:4px;}
+.cal-cell{aspect-ratio:1;background:white;border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:4px 2px;cursor:pointer;font-size:0.75rem;color:var(--ink);min-height:40px;}
+.cal-cell.empty{background:transparent;border-color:transparent;cursor:default;}
+.cal-cell.today{background:var(--soil);color:var(--cream);font-weight:700;border-color:var(--soil);}
+.cal-cell.selected{outline:2px solid var(--sage);outline-offset:1px;}
+.cdots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:2px;}
+.cdot{width:5px;height:5px;border-radius:50%;}
+.lawn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.lawn-task-card{background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);}
+.lawn-task-name{font-weight:700;color:var(--soil);font-size:0.9rem;margin-bottom:4px;}
+.lawn-task-timing{font-size:0.72rem;color:var(--bark);line-height:1.6;margin-bottom:8px;}
+.lawn-log-item{font-size:0.75rem;color:var(--ink);background:var(--parchment);border-radius:6px;padding:4px 8px;margin-bottom:4px;display:flex;gap:6px;}
+.lawn-log-date{color:var(--bark);flex-shrink:0;}
+.enc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.enc-card{background:white;border-radius:14px;padding:15px;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);position:relative;}
+.enc-header{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.enc-photo-el{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.enc-photo-ph{width:64px;height:64px;border-radius:10px;background:var(--parchment);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;}
+.enc-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--soil);font-weight:600;}
+.enc-latin{font-size:0.68rem;color:var(--bark);font-style:italic;margin-top:1px;}
+.enc-category{font-size:0.65rem;background:var(--parchment);color:var(--bark);padding:2px 8px;border-radius:8px;display:inline-block;margin-top:4px;}
+.enc-row{font-size:0.78rem;margin-bottom:5px;display:flex;gap:6px;align-items:flex-start;}
+.enc-label{font-size:0.63rem;font-weight:700;color:white;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.lbl-care{background:var(--moss);}.lbl-bloom{background:var(--harvest);}.lbl-note{background:var(--bark);}.lbl-place{background:var(--sky);}
+.enc-del{position:absolute;top:10px;right:10px;}
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.guide-card{background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);}
+.guide-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.guide-emoji{width:44px;height:44px;border-radius:10px;background:var(--parchment);display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.guide-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--soil);font-weight:600;}
+.guide-cat{font-size:0.68rem;color:var(--bark);margin-top:2px;}
+.gr{font-size:0.76rem;margin-bottom:6px;display:flex;gap:6px;align-items:flex-start;}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;cursor:pointer;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;}
+.spray-month-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:16px;}
+.spray-month-cell{background:white;border-radius:8px;border:1px solid var(--border);padding:8px 4px;text-align:center;font-size:0.72rem;}
+.spray-month-cell.active-month{background:rgba(192,57,43,0.1);border-color:rgba(192,57,43,0.4);}
+.spray-month-label{font-weight:700;color:var(--soil);}
+.spray-month-label.alert-label{color:var(--alert);}
+.spray-items{font-size:0.65rem;color:var(--bark);margin-top:3px;line-height:1.5;}
+.drug-card{background:white;border-radius:12px;border:1px solid var(--border);padding:14px 15px;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow);}
+.drug-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.drug-icon{font-size:1.3rem;width:36px;height:36px;background:var(--parchment);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.drug-name{font-weight:700;color:var(--soil);font-size:0.92rem;}
+.drug-type-badge{font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:8px;background:rgba(192,57,43,0.1);color:var(--alert);margin-left:4px;}
+.drug-brand{font-size:0.7rem;color:var(--bark);margin-top:1px;}
+.drug-rows{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.drug-row{font-size:0.76rem;}
+.drug-row-label{font-size:0.62rem;font-weight:700;color:white;padding:1px 6px;border-radius:5px;display:inline-block;margin-bottom:2px;}
+.lbl-red{background:var(--alert);}.lbl-blue{background:var(--sky);}.lbl-green{background:var(--moss);}.lbl-orange{background:var(--harvest);}.lbl-gray{background:var(--bark);}
+.drug-row-val{color:var(--ink);line-height:1.5;}
+.drug-caution{font-size:0.72rem;color:#b85c00;background:rgba(196,131,58,0.08);border-radius:7px;padding:6px 10px;margin-top:7px;display:flex;gap:5px;}
+.month-detail-card{background:white;border-radius:14px;border:1.5px solid rgba(192,57,43,0.2);padding:16px;margin-bottom:16px;}
+.month-detail-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--soil);font-weight:600;margin-bottom:6px;}
+.month-detail-note{font-size:0.8rem;color:var(--bark);margin-bottom:12px;line-height:1.6;}
+.lawn-chem-category{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--soil);font-weight:600;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.lawn-drug-card{background:white;border-radius:12px;border:1px solid var(--border);padding:13px 14px;margin-bottom:10px;box-shadow:0 2px 6px var(--shadow);}
+.lawn-drug-name{font-weight:700;color:var(--soil);font-size:0.88rem;margin-bottom:2px;}
+.lawn-drug-brand{font-size:0.68rem;color:var(--bark);margin-bottom:8px;}
+.lawn-drug-rows{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.lawn-drug-row{font-size:0.74rem;}
+.barney-memorial{background:linear-gradient(135deg,#3d2419,#5a3a28);border-radius:18px;padding:22px 20px;color:var(--cream);position:relative;overflow:hidden;margin-bottom:8px;}
+.barney-memorial::before{content:'🐾';position:absolute;right:16px;bottom:10px;font-size:5rem;opacity:0.08;}
+.barney-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;}
+.barney-paw{font-size:2.2rem;flex-shrink:0;}
+.barney-name{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;letter-spacing:0.05em;line-height:1;}
+.barney-dates{font-size:0.72rem;color:var(--tender);letter-spacing:0.1em;margin-top:4px;}
+.barney-words{font-size:0.8rem;color:rgba(247,241,230,0.8);margin-top:6px;line-height:1.7;}
+.barney-message{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:var(--tender);text-align:center;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);letter-spacing:0.04em;}
+.family-members{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+.member-card{background:white;border-radius:14px;border:1px solid var(--border);padding:14px 18px;text-align:center;box-shadow:0 2px 8px var(--shadow);flex:1;min-width:140px;}
+.member-icon{font-size:2rem;margin-bottom:6px;}
+.member-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--soil);font-weight:600;}
+.member-breed{font-size:0.7rem;color:var(--bark);margin-top:2px;}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+.photo-item{background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 8px var(--shadow);cursor:pointer;transition:transform 0.15s;}
+.photo-item:hover{transform:translateY(-2px);}
+.photo-item img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
+.photo-item-info{padding:8px 10px;}
+.photo-who{font-size:0.75rem;font-weight:700;color:var(--soil);}
+.photo-comment{font-size:0.7rem;color:var(--bark);margin-top:2px;line-height:1.4;}
+.photo-date{font-size:0.65rem;color:var(--bark);margin-top:3px;}
+.photo-del{background:none;border:none;cursor:pointer;color:var(--border);font-size:0.8rem;float:right;transition:color 0.2s;}
+.photo-del:hover{color:var(--alert);}
+.no-photo{font-size:0.82rem;color:var(--bark);padding:20px;text-align:center;grid-column:1/-1;}
+.hidden{display:none;}
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr;}
+  .form-row.triple{grid-template-columns:1fr 1fr;}
+  .dash-grid{grid-template-columns:1fr 1fr;}
+  .spray-month-grid{grid-template-columns:repeat(4,1fr);}
+  .drug-rows{grid-template-columns:1fr;}
+  .lawn-drug-rows{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="logo-en">My Ranzan Garden × Barney</div>
+      <div class="logo-sub">RANZAN-MACHI · SAITAMA · IN MEMORY OF BARNEY 🐾</div>
+    </div>
+    <div class="header-right">
+      <div class="today-str" id="todayStr"></div>
+      <div class="alert-banner" id="headerAlert" style="display:none">⚠️ 消毒時期です</div>
+    </div>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <div class="tab-inner">
+    <div class="tab active" onclick="switchTab('dashboard',this)">🏡 ホーム</div>
+    <div class="tab" onclick="switchTab('records',this)">📝 記録</div>
+    <div class="tab" onclick="switchTab('calendar',this)">📅 カレンダー</div>
+    <div class="tab" onclick="switchTab('lawn',this)">🟩 芝生</div>
+    <div class="tab" onclick="switchTab('encyclopedia',this)">🌸 植物図鑑</div>
+    <div class="tab" onclick="switchTab('spray',this)">🚿 消毒</div>
+    <div class="tab" onclick="switchTab('family',this)">🐾 ファミリー</div>
+    <div class="tab" onclick="switchTab('guide',this)">📖 栽培ガイド</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- DASHBOARD -->
+  <div id="view-dashboard" class="view active">
+    <div class="dash-grid" id="dashGrid"></div>
+    <div id="sprayAlert"></div>
+    <div class="sec-title">⏰ 次のお手入れ</div>
+    <div id="upcomingList"></div>
+    <div class="sec-title" style="margin-top:20px">📝 最近の記録</div>
+    <div id="recentList"></div>
+  </div>
+
+  <!-- RECORDS -->
+
+  <div id="view-records" class="view">
+    <button class="add-btn" onclick="toggleForm('recForm')">＋ 新しい記録を追加</button>
+    <div id="recForm" class="hidden">
+      <div class="add-form">
+        <div class="sec-title">✏️ 記録を追加</div>
+        <div class="form-row triple">
+          <div><label>種類</label>
+            <select id="rType">
+              <option value="planting">🌱 種まき・植え付け</option>
+              <option value="fertilizer">🌾 肥料・施肥</option>
+              <option value="harvest">🍅 収穫</option>
+              <option value="water">💧 水やり</option>
+              <option value="spray">🚿 消毒・薬剤散布</option>
+              <option value="photo">📷 生育記録（写真）</option>
+            </select></div>
+          <div><label>植物・場所</label>
+            <select id="rPlant">
+              <option value="ミニトマト">🍅 ミニトマト</option>
+              <option value="トマト">🍅 トマト</option>
+              <option value="マリーゴールド">🌼 マリーゴールド</option>
+              <option value="葉物野菜">🥬 葉物野菜</option>
+              <option value="ハーブ類">🌿 ハーブ類</option>
+              <option value="宿根草">🌸 宿根草</option>
+              <option value="一年草">🌼 一年草</option>
+              <option value="芝生(TM9)">🟩 芝生(TM9)</option>
+              <option value="庭木・低木">🌳 庭木・低木</option>
+              <option value="その他">🌱 その他</option>
+            </select></div>
+          <div><label>実施日</label><input type="date" id="rDate"></div>
+        </div>
+        <div class="form-row">
+          <div><label>メモ・内容</label><textarea id="rNote" placeholder="例）マリーゴールドとミニトマトの種まき"></textarea></div>
+          <div>
+            <label>次回予定日（任意）</label><input type="date" id="rNext">
+            <label style="margin-top:8px">次回メモ</label><input type="text" id="rNextNote" placeholder="例）発芽確認、間引き">
+          </div>
+        </div>
+        <div class="form-row single"><div><label>📷 写真（任意）</label><input type="file" id="rPhoto" accept="image/*"></div></div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="toggleForm('recForm')">キャンセル</button>
+          <button class="btn-primary" onclick="saveRecord()">💾 保存する</button>
+        </div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <button class="chip active" onclick="setFilter('all',this)">すべて</button>
+      <button class="chip" onclick="setFilter('planting',this)">🌱 種まき</button>
+      <button class="chip" onclick="setFilter('fertilizer',this)">🌾 肥料</button>
+      <button class="chip" onclick="setFilter('harvest',this)">🍅 収穫</button>
+      <button class="chip" onclick="setFilter('spray',this)">🚿 消毒</button>
+      <button class="chip" onclick="setFilter('photo',this)">📷 写真記録</button>
+      <button class="chip" onclick="setFilter('water',this)">💧 水やり</button>
+    </div>
+    <div id="recordsList"></div>
+  </div>
+
+  <!-- CALENDAR -->
+
+  <div id="view-calendar" class="view">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">◀</button>
+      <div class="cal-month" id="calLabel"></div>
+      <button class="cal-nav" onclick="changeMonth(1)">▶</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div id="dayDetail"></div>
+  </div>
+
+  <!-- LAWN -->
+
+  <div id="view-lawn" class="view">
+    <p style="font-size:0.8rem;color:var(--bark);margin-bottom:16px">TM9（低成長高麗芝）の年間管理スケジュールと作業記録</p>
+    <div class="lawn-grid" id="lawnGrid"></div>
+    <div class="sec-title">📝 芝生作業を記録する</div>
+    <div class="add-form">
+      <div class="form-row triple">
+        <div><label>作業内容</label>
+          <select id="lawnTask">
+            <option value="mowing">✂️ 芝刈り</option>
+            <option value="thatching">🌾 サッチング</option>
+            <option value="coring">🕳️ コアリング</option>
+            <option value="fertilizing">🌿 施肥</option>
+            <option value="watering">💧 水やり</option>
+            <option value="weed">🌿 除草</option>
+            <option value="other">📝 その他</option>
+          </select></div>
+        <div><label>実施日</label><input type="date" id="lawnDate"></div>
+        <div><label>メモ</label><input type="text" id="lawnNote" placeholder="例）刈り高15mm"></div>
+      </div>
+      <div class="form-actions"><button class="btn-primary" onclick="saveLawnRecord()">💾 保存</button></div>
+    </div>
+    <div class="sec-title" style="margin-top:8px">📋 芝生作業の履歴</div>
+    <div id="lawnHistory"></div>
+    <div class="sec-title" style="margin-top:28px">💊 TM9専用 肥料・薬剤ガイド</div>
+    <div id="lawnChemicalsGuide"></div>
+  </div>
+
+  <!-- ENCYCLOPEDIA -->
+
+  <div id="view-encyclopedia" class="view">
+    <p style="font-size:0.8rem;color:var(--bark);margin-bottom:14px">植えた植物を記録しておく図鑑。宿根草など名前を忘れがちな植物に。</p>
+    <button class="add-btn" onclick="toggleForm('encForm')">＋ 植物を追加</button>
+    <div id="encForm" class="hidden">
+      <div class="add-form">
+        <div class="sec-title">🌸 植物を図鑑に追加</div>
+        <div class="form-row triple">
+          <div><label>植物名（和名）</label><input type="text" id="eName" placeholder="例）エキナセア"></div>
+          <div><label>学名・英名（任意）</label><input type="text" id="eLatin" placeholder="例）Echinacea purpurea"></div>
+          <div><label>カテゴリ</label>
+            <select id="eCat">
+              <option>宿根草</option><option>一年草</option><option>二年草</option><option>球根</option>
+              <option>低木</option><option>庭木</option><option>ハーブ</option><option>野菜</option><option>その他</option>
+            </select></div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label>開花時期</label><input type="text" id="eBloom" placeholder="例）6月〜9月">
+            <label style="margin-top:8px">植えた場所</label><input type="text" id="ePlace" placeholder="例）レイズドベッド東側">
+          </div>
+          <div><label>育て方・管理メモ</label><textarea id="eCare" placeholder="例）耐寒性強、花後に切り戻しで再開花"></textarea></div>
+        </div>
+        <div class="form-row single"><div><label>📷 写真</label><input type="file" id="ePhoto" accept="image/*"></div></div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="toggleForm('encForm')">キャンセル</button>
+          <button class="btn-primary" onclick="saveEncEntry()">💾 図鑑に登録</button>
+        </div>
+      </div>
+    </div>
+    <div class="enc-grid" id="encGrid"></div>
+  </div>
+
+  <!-- SPRAY -->
+
+  <div id="view-spray" class="view">
+    <div class="sec-title">🗓️ 月別 消毒・病害虫カレンダー</div>
+    <div class="spray-month-grid" id="sprayMonthGrid"></div>
+    <div class="sec-title" style="margin-top:20px">⚠️ 今月のアラートと推奨薬剤</div>
+    <div id="sprayAlertDetail"></div>
+    <div class="sec-title" style="margin-top:24px">📦 薬剤・肥料の在庫管理</div>
+    <button class="add-btn" onclick="toggleForm('stockForm')">＋ 薬剤・肥料を登録</button>
+    <div id="stockForm" class="hidden">
+      <div class="add-form">
+        <div class="sec-title">📦 在庫を登録</div>
+        <div class="form-row triple">
+          <div><label>薬剤・肥料名</label><input type="text" id="stName" placeholder="例）カルスNCR"></div>
+          <div><label>カテゴリ</label>
+            <select id="stCat">
+              <option value="微生物資材">🦠 微生物資材</option>
+              <option value="殺虫剤">🪲 殺虫剤</option>
+              <option value="殺菌剤">🍃 殺菌剤</option>
+              <option value="殺虫殺菌">🌿 殺虫殺菌</option>
+              <option value="殺ダニ剤">🕷️ 殺ダニ剤</option>
+              <option value="肥料">🌾 肥料</option>
+              <option value="土壌改良材">🌱 土壌改良材</option>
+              <option value="除草剤">🌿 除草剤</option>
+              <option value="その他">📝 その他</option>
+            </select></div>
+          <div><label>購入日</label><input type="date" id="stDate"></div>
+        </div>
+        <div class="form-row triple">
+          <div><label>購入量</label><input type="text" id="stAmount" placeholder="例）500g"></div>
+          <div><label>残量・在庫メモ</label><input type="text" id="stStock" placeholder="例）半分くらい残り"></div>
+          <div><label>保管場所</label><input type="text" id="stPlace" placeholder="例）物置の棚"></div>
+        </div>
+        <div class="form-row single"><div><label>メモ</label><textarea id="stNote" placeholder="例）コアリング後に散布"></textarea></div></div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="toggleForm('stockForm')">キャンセル</button>
+          <button class="btn-primary" onclick="saveStock()">💾 登録する</button>
+        </div>
+      </div>
+    </div>
+    <div id="stockList"></div>
+    <div class="sec-title" style="margin-top:24px">📋 消毒の記録</div>
+    <div id="sprayRecords"></div>
+  </div>
+
+  <!-- FAMILY -->
+
+  <div id="view-family" class="view">
+    <div class="barney-memorial">
+      <div class="barney-header">
+        <div class="barney-paw">🐾</div>
+        <div>
+          <div class="barney-name">Barney</div>
+          <div class="barney-dates">Chocolate Labrador · 〜 2019</div>
+          <div class="barney-words">やんちゃで、紳士で、かっこよくて、優しくて、賢くて、ダイナミック。</div>
+        </div>
+      </div>
+      <div class="barney-message">この庭のどこかにいつも、バーニーがいます。</div>
+    </div>
+    <div class="sec-title" style="margin-top:24px">🏡 今の家族</div>
+    <div class="family-members">
+      <div class="member-card"><div class="member-icon">🍫</div><div class="member-name">Will（ウィル）</div><div class="member-breed">Chocolate Labrador</div></div>
+      <div class="member-card"><div class="member-icon">🦊</div><div class="member-name">Iris（アイちゃん）</div><div class="member-breed">保護犬</div></div>
+    </div>
+    <div class="sec-title" style="margin-top:24px">📷 ガーデンアルバム</div>
+    <p style="font-size:0.78rem;color:var(--bark);margin-bottom:14px">バーニー、ウィル、アイちゃん、遊びに来た鳥や生き物たちの記録</p>
+    <button class="add-btn" onclick="toggleForm('familyForm')">＋ 写真を追加</button>
+    <div id="familyForm" class="hidden">
+      <div class="add-form">
+        <div class="sec-title">📷 アルバムに追加</div>
+        <div class="form-row triple">
+          <div><label>だれ・なに</label>
+            <select id="fWho">
+              <option value="Barney">🐾 Barney（バーニー）</option>
+              <option value="Will">🍫 Will（ウィル）</option>
+              <option value="Iris">🦊 Iris（アイちゃん）</option>
+              <option value="鳥">🐦 遊びに来た鳥</option>
+              <option value="生き物">🐛 その他の生き物</option>
+              <option value="みんな">🐾 みんな</option>
+            </select></div>
+          <div><label>日付</label><input type="date" id="fDate"></div>
+          <div><label>コメント</label><input type="text" id="fComment" placeholder="例）初めて来たジョウビタキ"></div>
+        </div>
+        <div class="form-row single"><div><label>📷 写真</label><input type="file" id="fPhoto" accept="image/*"></div></div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="toggleForm('familyForm')">キャンセル</button>
+          <button class="btn-primary" onclick="saveFamilyPhoto()">💾 アルバムに追加</button>
+        </div>
+      </div>
+    </div>
+    <div class="filter-bar" id="familyFilterBar">
+      <button class="chip active" onclick="setFamilyFilter('all',this)">すべて</button>
+      <button class="chip" onclick="setFamilyFilter('Barney',this)">🐾 Barney</button>
+      <button class="chip" onclick="setFamilyFilter('Will',this)">🍫 Will</button>
+      <button class="chip" onclick="setFamilyFilter('Iris',this)">🦊 Iris</button>
+      <button class="chip" onclick="setFamilyFilter('鳥',this)">🐦 鳥</button>
+      <button class="chip" onclick="setFamilyFilter('生き物',this)">🐛 生き物</button>
+    </div>
+    <div class="photo-grid" id="familyPhotoGrid"></div>
+  </div>
+
+  <!-- GUIDE -->
+
+  <div id="view-guide" class="view">
+    <p style="font-size:0.8rem;color:var(--bark);margin-bottom:14px">嵐山町（埼玉県）の気候に合わせた栽培の目安です。</p>
+    <div class="guide-grid" id="guideGrid"></div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+var TYPE_CFG = {
+  planting:  {icon:'🌱',label:'種まき・植え付け',cls:'t-planting'},
+  fertilizer:{icon:'🌾',label:'肥料・施肥',cls:'t-fertilizer'},
+  harvest:   {icon:'🍅',label:'収穫',cls:'t-harvest'},
+  water:     {icon:'💧',label:'水やり',cls:'t-water'},
+  spray:     {icon:'🚿',label:'消毒・薬剤散布',cls:'t-spray'},
+  photo:     {icon:'📷',label:'生育記録',cls:'t-photo'}
+};
+var LAWN_TASKS = {
+  mowing:     {icon:'✂️',label:'芝刈り',timing:'4〜10月：月1〜2回'},
+  thatching:  {icon:'🌾',label:'サッチング',timing:'3〜4月 / 10月 年2回'},
+  coring:     {icon:'🕳️',label:'コアリング',timing:'4〜5月 または 9月'},
+  fertilizing:{icon:'🌿',label:'施肥',timing:'5月・8月・9月'},
+  watering:   {icon:'💧',label:'水やり',timing:'土が乾いたら'},
+  weed:       {icon:'🌿',label:'除草',timing:'随時'},
+  other:      {icon:'📝',label:'その他',timing:''}
+};
+var SPRAY_SCHEDULE = [
+  {month:1,label:'1月',alert:false,note:'休眠期。散布不要。',drugs:[]},
+  {month:2,label:'2月',alert:false,note:'落葉樹の芽吹き前。石灰硫黄合剤で越冬病害虫を一掃できる。',drugs:[
+    {icon:'🧪',name:'石灰硫黄合剤',type:'殺菌殺虫',target:'越冬害虫・カイガラムシ',dilution:'20〜30倍希釈',timing:'落葉〜芽吹き前',caution:'展葉後は薬害あり。換気・手袋必須'}
+  ]},
+  {month:3,label:'3月',alert:false,note:'芽吹き前の予防散布。アブラムシの卵が孵化し始める。',drugs:[
+    {icon:'🧪',name:'石灰硫黄合剤',type:'殺菌殺虫',target:'越冬病害虫全般',dilution:'20〜30倍',timing:'3月上旬まで',caution:'展葉後は使用不可'}
+  ]},
+  {month:4,label:'4月',alert:true,note:'⚠️ 新芽にアブラムシが急増。うどんこ病も出始める。',drugs:[
+    {icon:'🪲',name:'スミチオン乳剤',type:'殺虫',target:'アブラムシ・アオムシ',dilution:'1000倍希釈',timing:'発生初期',caution:'ミツバチに毒性。開花中は避ける'},
+    {icon:'🌿',name:'ベニカXファインスプレー',type:'殺虫殺菌',target:'アブラムシ・うどんこ病',dilution:'そのまま使用',timing:'発生時',caution:'耐性がつくので連続使用注意'}
+  ]},
+  {month:5,label:'5月',alert:true,note:'⚠️ 最重要月！気温上昇で病害虫が一気に活発化。',drugs:[
+    {icon:'🪲',name:'スミチオン乳剤',type:'殺虫',target:'アブラムシ・ヨトウムシ',dilution:'1000倍希釈',timing:'朝か夕方に散布',caution:'収穫7日前まで'},
+    {icon:'🍅',name:'ダコニール1000',type:'殺菌',target:'疫病・灰色かび病・炭疽病',dilution:'1000倍希釈',timing:'予防として7〜10日ごと',caution:'トマト疫病の予防に特に有効'}
+  ]},
+  {month:6,label:'6月',alert:true,note:'⚠️ 梅雨時期。湿気で灰色かび病・べと病が多発。',drugs:[
+    {icon:'🌧️',name:'ダコニール1000',type:'殺菌',target:'べと病・灰色かび病',dilution:'1000倍希釈',timing:'梅雨入り前に予防散布',caution:'雨前に散布すると効果的'}
+  ]},
+  {month:7,label:'7月',alert:true,note:'⚠️ 高温乾燥でハダニが大量発生。葉裏を毎回確認。',drugs:[
+    {icon:'🕷️',name:'コロマイト乳剤',type:'殺ダニ剤',target:'ハダニ（各種）',dilution:'1000〜2000倍希釈',timing:'葉裏に十分かかるよう散布',caution:'他の殺ダニ剤と交互使用で耐性予防'}
+  ]},
+  {month:8,label:'8月',alert:true,note:'⚠️ ハダニ継続注意。猛暑での散布は薬害リスク大。必ず早朝か日没後に。',drugs:[
+    {icon:'🕷️',name:'コロマイト乳剤',type:'殺ダニ剤',target:'ハダニ',dilution:'1000〜2000倍',timing:'早朝または日没後のみ',caution:'35℃以上は散布しない'}
+  ]},
+  {month:9,label:'9月',alert:false,note:'秋の病気予防。気温が落ち着いたら予防散布。',drugs:[
+    {icon:'🍃',name:'ダコニール1000',type:'殺菌',target:'炭疽病・葉枯れ病',dilution:'1000倍希釈',timing:'9月中旬から月1回',caution:'収穫前日まで使用可'}
+  ]},
+  {month:10,label:'10月',alert:false,note:'活動が落ち着く。開花中の植物は農薬を控える。',drugs:[]},
+  {month:11,label:'11月',alert:false,note:'不要。越冬準備の時期。',drugs:[]},
+  {month:12,label:'12月',alert:false,note:'不要。休眠期。',drugs:[]}
+];
+var LAWN_CHEMICALS = [
+  {category:'🌿 肥料',items:[
+    {icon:'🌿',name:'芝生の肥料（緩効性）',brand:'コウヤマキ・ターフ芝肥料など',timing:'5月・8月・9月の年3回',usage:'1㎡あたり30〜50g。均一散布後に水やり',npk:'N:P:K=10:6:6',caution:'窒素過多は徒長・病気の原因に'},
+    {icon:'💧',name:'液体肥料（速効性）',brand:'ハイポネックス原液など',timing:'生育期（5〜9月）2週間に1回',usage:'1000倍希釈して水やり代わりに',npk:'N:P:K=6:10:5',caution:'濃すぎると根が傷む'}
+  ]},
+  {category:'🚿 除草剤',items:[
+    {icon:'🌿',name:'シバキープII粒剤',brand:'シバキープII',timing:'雑草発生前〜初期（4〜5月、9〜10月）',usage:'1㎡あたり40g散布後水をかける',npk:'—',caution:'芝生以外に飛散しないよう注意'}
+  ]},
+  {category:'🪲 殺虫・殺菌（芝専用）',items:[
+    {icon:'🍃',name:'グラステン水和剤',brand:'グラステン水和剤',timing:'梅雨前（6月）と夏明け（9月）',usage:'1000倍希釈。1㎡あたり1L散布',npk:'—',caution:'ラージパッチ・葉腐れ病の予防に有効'}
+  ]}
+];
+var GUIDE_PLANTS = [
+  {emoji:'🍅',name:'ミニトマト',cat:'夏野菜',seed:'3月上旬〜4月上旬',plant:'5月上旬〜中旬',harvest:'7月〜9月',fertilize:'2週ごとに追肥',note:'支柱必須。摘芯で実付きUP'},
+  {emoji:'🌼',name:'マリーゴールド',cat:'一年草',seed:'4月〜5月',plant:'5月中旬以降',harvest:'花を楽しむ',fertilize:'月1〜2回液肥',note:'害虫除け。野菜の近くに◎'},
+  {emoji:'🥬',name:'葉物野菜',cat:'春・秋まき',seed:'春：3〜4月 / 秋：9〜10月',plant:'春：4〜5月 / 秋：10月',harvest:'種まきから30〜60日',fertilize:'2〜3週ごとに薄い液肥',note:'秋まきが管理しやすい'},
+  {emoji:'🌿',name:'ハーブ類',cat:'多年草・一年草',seed:'バジル：5月〜',plant:'5〜6月',harvest:'随時（花前がベスト）',fertilize:'月1回。少なめが香り◎',note:'ミントはポット植え推奨'},
+  {emoji:'🌸',name:'宿根草',cat:'エキナセア・サルビアなど',seed:'春（3〜4月）または秋',plant:'春：4〜5月 / 秋：9〜10月',harvest:'花を楽しむ',fertilize:'春芽出し時と花後に緩効性肥料',note:'一度植えれば毎年。株分けで増やせる'},
+  {emoji:'🟩',name:'芝生(TM9)',cat:'高麗芝改良種',seed:'—（張り芝）',plant:'4月〜6月',harvest:'—',fertilize:'5月・8月・9月に芝生用緩効性肥料',note:'低成長で刈り込み頻度少なめ◎'}
+];
+var DOT_COLORS={planting:'#4A6741',fertilizer:'#C4833A',harvest:'#6a9fb5',water:'#7a9e7e',spray:'#c0392b',photo:'#7a9e7e'};
+var WHO_ICON={Barney:'🐾',Will:'🍫',Iris:'🦊','鳥':'🐦','生き物':'🐛','みんな':'🐾'};
+var records,lawnRecords,encEntries,familyPhotos,stockList;
+var currentFilter='all',familyFilter='all';
+var calYear,calMonth,selectedDate;
+function load(key,def){try{var v=localStorage.getItem(key);return v?JSON.parse(v):def;}catch(e){return def;}}
+function save(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch(e){}}
+function init(){
+  records=load('mrg_records',[]);
+  lawnRecords=load('mrg_lawn',[]);
+  encEntries=load('mrg_enc',[]);
+  familyPhotos=load('mrg_family',[]);
+  stockList=load('mrg_stock',[]);
+  var now=new Date();
+  calYear=now.getFullYear();calMonth=now.getMonth();selectedDate=toYMD(now);
+  document.getElementById('todayStr').textContent=now.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  document.getElementById('rDate').value=toYMD(now);
+  document.getElementById('fDate').value=toYMD(now);
+  document.getElementById('stDate').value=toYMD(now);
+  document.getElementById('lawnDate').value=toYMD(now);
+  var m=now.getMonth()+1;
+  var sp=SPRAY_SCHEDULE.find(function(s){return s.month===m;});
+  if(sp&&sp.alert)document.getElementById('headerAlert').style.display='flex';
+  renderDashboard();renderRecords();renderCalendar();renderLawn();
+  renderEncyclopedia();renderSpray();renderLawnChemicals();renderGuide();renderFamilyGrid();
+}
+function toYMD(d){return d.toISOString().split('T')[0];}
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('view-'+name).classList.add('active');
+}
+function toggleForm(id){document.getElementById(id).classList.toggle('hidden');}
+function renderDashboard(){
+  var now=new Date(),ym=toYMD(now).slice(0,7);
+  var c={planting:0,fertilizer:0,harvest:0,spray:0};
+  records.forEach(function(r){if(r.date.startsWith(ym)&&c[r.type]!==undefined)c[r.type]++;});
+  document.getElementById('dashGrid').innerHTML=
+    '<div class="stat-card"><div class="stat-num">'+records.length+'</div><div class="stat-lbl">総記録数</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+c.planting+'</div><div class="stat-lbl">今月の種まき</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+c.harvest+'</div><div class="stat-lbl">今月の収穫</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+encEntries.length+'</div><div class="stat-lbl">植物図鑑の登録数</div></div>';
+  var m=now.getMonth()+1,sp=SPRAY_SCHEDULE.find(function(s){return s.month===m;});
+  var spEl=document.getElementById('sprayAlert');
+  if(sp&&sp.drugs.length>0){spEl.innerHTML='<div class="alert-card" style="margin-bottom:18px"><div class="alert-icon">⚠️</div><div class="alert-body"><div class="alert-title">消毒・病害虫対策の時期です</div><div class="alert-desc">'+sp.note+'</div></div></div>';}
+  else{spEl.innerHTML='<div class="ok-card" style="margin-bottom:18px"><span style="font-size:1.3rem">✅</span><div style="font-size:0.82rem;color:var(--moss)">'+m+'月は消毒の必要はほぼありません。</div></div>';}
+  var upcoming=records.filter(function(r){return r.nextDate;}).map(function(r){return Object.assign({},r,{diff:Math.round((new Date(r.nextDate)-now)/86400000)});}).sort(function(a,b){return a.diff-b.diff;}).slice(0,6);
+  document.getElementById('upcomingList').innerHTML=upcoming.length?upcoming.map(function(r){
+    var cfg=TYPE_CFG[r.type]||TYPE_CFG.planting;
+    var ds=r.diff<0?Math.abs(r.diff)+'日超過！':r.diff===0?'今日！':'あと'+r.diff+'日';
+    var cls=r.diff<0?'overdue':r.diff<=3?'soon':'ok-badge';
+    return '<div class="upcoming-item"><div class="upcoming-icon">'+cfg.icon+'</div><div class="upcoming-text"><div class="upcoming-title">'+r.plant+' — '+cfg.label+'</div><div class="upcoming-sub">'+(r.nextNote||r.nextDate)+'</div></div><span class="days-badge '+cls+'">'+ds+'</span></div>';
+  }).join(''):'<p style="font-size:0.82rem;color:var(--bark);padding:10px">次回予定の記録がありません。</p>';
+  var recent=records.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,3);
+  document.getElementById('recentList').innerHTML=recent.length?recent.map(recCardHTML).join(''):'<p style="font-size:0.82rem;color:var(--bark);padding:10px">記録がありません。</p>';
+}
+function setFilter(f,el){currentFilter=f;document.querySelectorAll('#view-records .chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');renderRecords();}
+function renderRecords(){
+  var filtered=currentFilter==='all'?records:records.filter(function(r){return r.type===currentFilter;});
+  var sorted=filtered.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  document.getElementById('recordsList').innerHTML=sorted.length?sorted.map(recCardHTML).join(''):'<p style="font-size:0.82rem;color:var(--bark);padding:16px;text-align:center">記録がありません</p>';
+}
+function recCardHTML(r){
+  var cfg=TYPE_CFG[r.type]||TYPE_CFG.planting;
+  var d=new Date(r.date+'T00:00:00');
+  var dl=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
+  var photoHTML=r.photo?'<img class="rec-photo" src="'+r.photo+'" onclick="openLightbox(\''+r.photo+'\')">':'';
+  return '<div class="rec-card"><div class="rec-icon-wrap">'+cfg.icon+'</div><div class="rec-body"><div class="rec-meta"><span class="type-badge '+cfg.cls+'">'+cfg.label+'</span><span class="rec-plant">'+r.plant+'</span><span class="rec-date">'+dl+'</span></div>'+(r.note?'<div class="rec-note">'+r.note+'</div>':'')+(r.nextDate?'<div class="rec-next">📌 次回：'+r.nextDate+(r.nextNote?' — '+r.nextNote:'')+'</div>':'')+'</div>'+photoHTML+'<button class="del-btn" onclick="deleteRecord(\''+r.id+'\')">🗑</button></div>';
+}
+function saveRecord(){
+  var type=document.getElementById('rType').value,plant=document.getElementById('rPlant').value,date=document.getElementById('rDate').value,note=document.getElementById('rNote').value.trim(),nextDate=document.getElementById('rNext').value,nextNote=document.getElementById('rNextNote').value.trim(),photoFile=document.getElementById('rPhoto').files[0];
+  if(!date){alert('日付を入力してください');return;}
+  function finalize(photoData){
+    records.unshift({id:Date.now().toString(),type:type,plant:plant,date:date,note:note,nextDate:nextDate,nextNote:nextNote,photo:photoData||null});
+    save('mrg_records',records);
+    document.getElementById('rNote').value='';document.getElementById('rNext').value='';document.getElementById('rNextNote').value='';document.getElementById('rPhoto').value='';document.getElementById('rDate').value=toYMD(new Date());
+    toggleForm('recForm');renderRecords();renderDashboard();renderCalendar();
+    if(type==='spray')renderSpray();
+  }
+  if(photoFile){var reader=new FileReader();reader.onload=function(e){finalize(e.target.result);};reader.readAsDataURL(photoFile);}
+  else finalize(null);
+}
+function deleteRecord(id){if(!confirm('この記録を削除しますか？'))return;records=records.filter(function(r){return r.id!==id;});save('mrg_records',records);renderRecords();renderDashboard();renderCalendar();}
+function renderCalendar(){
+  document.getElementById('calLabel').textContent=calYear+'年 '+(calMonth+1)+'月';
+  var first=new Date(calYear,calMonth,1).getDay(),days=new Date(calYear,calMonth+1,0).getDate(),todayStr=toYMD(new Date()),byDate={};
+  records.forEach(function(r){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);});
+  var html=['日','月','火','水','木','金','土'].map(function(d){return '<div class="cal-dn">'+d+'</div>';}).join('');
+  for(var i=0;i<first;i++)html+='<div class="cal-cell empty"></div>';
+  for(var dd=1;dd<=days;dd++){
+    var ds=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+    var evs=byDate[ds]||[];
+    var dots=[...new Set(evs.map(function(e){return e.type;}))].map(function(t){return '<div class="cdot" style="background:'+(DOT_COLORS[t]||'#aaa')+'"></div>';}).join('');
+    html+='<div class="cal-cell'+(ds===todayStr?' today':'')+(ds===selectedDate?' selected':'')+'" onclick="selectDate(\''+ds+'\')">'+dd+(dots?'<div class="cdots">'+dots+'</div>':'')+'</div>';
+  }
+  document.getElementById('calGrid').innerHTML=html;
+  renderDayDetail(selectedDate,byDate[selectedDate]||[]);
+}
+function selectDate(ds){selectedDate=ds;renderCalendar();}
+function changeMonth(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+function renderDayDetail(ds,evs){
+  var d=new Date(ds+'T00:00:00'),lbl=d.toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
+  document.getElementById('dayDetail').innerHTML='<div class="card" style="margin-top:4px"><div class="sec-title" style="font-size:0.95rem;margin-bottom:10px">📅 '+lbl+'</div>'+(evs.length?evs.map(recCardHTML).join(''):'<div style="font-size:0.82rem;color:var(--bark);text-align:center;padding:10px">この日の記録はありません</div>')+'</div>';
+}
+function renderLawn(){
+  document.getElementById('lawnGrid').innerHTML=Object.entries(LAWN_TASKS).map(function(e){
+    var key=e[0],t=e[1],logs=lawnRecords.filter(function(r){return r.task===key;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,3);
+    return '<div class="lawn-task-card"><div class="lawn-task-name">'+t.icon+' '+t.label+'</div><div class="lawn-task-timing">'+t.timing+'</div>'+logs.map(function(l){return '<div class="lawn-log-item"><span class="lawn-log-date">'+l.date.slice(5).replace('-','/')+'</span>'+(l.note||'')+'</div>';}).join('')+(!logs.length?'<div style="font-size:0.7rem;color:var(--bark)">記録なし</div>':'')+'</div>';
+  }).join('');
+  renderLawnHistory();
+}
+function saveLawnRecord(){
+  var task=document.getElementById('lawnTask').value,date=document.getElementById('lawnDate').value,note=document.getElementById('lawnNote').value.trim();
+  if(!date){alert('日付を入力してください');return;}
+  lawnRecords.unshift({id:Date.now().toString(),task:task,date:date,note:note});
+  save('mrg_lawn',lawnRecords);document.getElementById('lawnNote').value='';document.getElementById('lawnDate').value=toYMD(new Date());renderLawn();
+}
+function renderLawnHistory(){
+  var sorted=lawnRecords.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  document.getElementById('lawnHistory').innerHTML=sorted.length?sorted.map(function(r){
+    var t=LAWN_TASKS[r.task]||LAWN_TASKS.other,d=new Date(r.date+'T00:00:00'),dl=d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',weekday:'short'});
+    return '<div class="rec-card"><div class="rec-icon-wrap">'+t.icon+'</div><div class="rec-body"><div class="rec-meta"><span class="type-badge t-lawn">'+t.label+'</span><span class="rec-date">'+dl+'</span></div>'+(r.note?'<div class="rec-note">'+r.note+'</div>':'')+'</div><button class="del-btn" onclick="deleteLawn(\''+r.id+'\')">🗑</button></div>';
+  }).join(''):'<p style="font-size:0.82rem;color:var(--bark);padding:10px">芝生作業の記録がありません</p>';
+}
+function deleteLawn(id){if(!confirm('削除しますか？'))return;lawnRecords=lawnRecords.filter(function(r){return r.id!==id;});save('mrg_lawn',lawnRecords);renderLawn();}
+function renderEncyclopedia(){
+  document.getElementById('encGrid').innerHTML=encEntries.length?encEntries.map(function(e){
+    var photoEl=e.photo?'<img src="'+e.photo+'" class="enc-photo-el" onclick="openLightbox(\''+e.photo+'\')">':'<div class="enc-photo-ph">🌱</div>';
+    return '<div class="enc-card"><button class="del-btn enc-del" onclick="deleteEnc(\''+e.id+'\')">🗑</button><div class="enc-header">'+photoEl+'<div><div class="enc-name">'+e.name+'</div>'+(e.latin?'<div class="enc-latin">'+e.latin+'</div>':'')+'<span class="enc-category">'+e.cat+'</span></div></div>'+(e.bloom?'<div class="enc-row"><span class="enc-label lbl-bloom">開花</span><span>'+e.bloom+'</span></div>':'')+(e.place?'<div class="enc-row"><span class="enc-label lbl-place">場所</span><span>'+e.place+'</span></div>':'')+(e.care?'<div class="enc-row"><span class="enc-label lbl-care">管理</span><span>'+e.care+'</span></div>':'')+'<div style="font-size:0.68rem;color:var(--bark);margin-top:6px">登録日：'+e.date+'</div></div>';
+  }).join(''):'<p style="font-size:0.82rem;color:var(--bark);padding:10px">植物が登録されていません。</p>';
+}
+function saveEncEntry(){
+  var name=document.getElementById('eName').value.trim();
+  if(!name){alert('植物名を入力してください');return;}
+  var photoFile=document.getElementById('ePhoto').files[0];
+  function finalize(photoData){
+    encEntries.unshift({id:Date.now().toString(),name:name,latin:document.getElementById('eLatin').value.trim(),cat:document.getElementById('eCat').value,bloom:document.getElementById('eBloom').value.trim(),place:document.getElementById('ePlace').value.trim(),care:document.getElementById('eCare').value.trim(),photo:photoData||null,date:toYMD(new Date())});
+    save('mrg_enc',encEntries);['eName','eLatin','eBloom','ePlace','eCare'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('ePhoto').value='';toggleForm('encForm');renderEncyclopedia();renderDashboard();
+  }
+  if(photoFile){var reader=new FileReader();reader.onload=function(e){finalize(e.target.result);};reader.readAsDataURL(photoFile);}
+  else finalize(null);
+}
+function deleteEnc(id){if(!confirm('削除しますか？'))return;encEntries=encEntries.filter(function(e){return e.id!==id;});save('mrg_enc',encEntries);renderEncyclopedia();renderDashboard();}
+function drugCardHTML(d){
+  return '<div class="drug-card"><div class="drug-header"><div class="drug-icon">'+d.icon+'</div><div><div class="drug-name">'+d.name+'<span class="drug-type-badge">'+d.type+'</span></div></div></div><div class="drug-rows"><div class="drug-row"><div class="drug-row-label lbl-red">対象病害虫</div><div class="drug-row-val">'+d.target+'</div></div><div class="drug-row"><div class="drug-row-label lbl-blue">希釈倍率</div><div class="drug-row-val">'+d.dilution+'</div></div><div class="drug-row"><div class="drug-row-label lbl-green">タイミング</div><div class="drug-row-val">'+d.timing+'</div></div></div>'+(d.caution?'<div class="drug-caution">⚠️ '+d.caution+'</div>':'')+'</div>';
+}
+function renderSpray(){
+  var now=new Date(),curM=now.getMonth()+1;
+  document.getElementById('sprayMonthGrid').innerHTML=SPRAY_SCHEDULE.map(function(s){
+    var isCur=s.month===curM;
+    return '<div class="spray-month-cell'+(s.alert?' active-month':'')+'" style="'+(isCur?'outline:2px solid var(--sage);outline-offset:2px':'')+'"><div class="spray-month-label'+(s.alert?' alert-label':'')+'">'+s.label+(isCur?' ◀':'')+'</div><div class="spray-items">'+(s.drugs.length?s.drugs.map(function(d){return d.name;}).join('<br>'):'—')+'</div></div>';
+  }).join('');
+  var sp=SPRAY_SCHEDULE.find(function(s){return s.month===curM;}),adEl=document.getElementById('sprayAlertDetail');
+  if(sp&&sp.drugs.length>0){adEl.innerHTML='<div class="month-detail-card"><div class="month-detail-title">'+(sp.alert?'⚠️ ':'✅ ')+curM+'月の対策ポイント</div><div class="month-detail-note">'+sp.note+'</div>'+sp.drugs.map(drugCardHTML).join('')+'</div>';}
+  else{adEl.innerHTML='<div class="ok-card" style="margin-bottom:12px"><span style="font-size:1.3rem">✅</span><div style="font-size:0.82rem;color:var(--moss)">'+curM+'月は消毒はほぼ不要です。</div></div>';}
+  var sprayRecs=records.filter(function(r){return r.type==='spray';}).sort(function(a,b){return b.date.localeCompare(a.date);});
+  document.getElementById('sprayRecords').innerHTML=sprayRecs.length?sprayRecs.map(recCardHTML).join(''):'<p style="font-size:0.82rem;color:var(--bark);padding:10px">消毒の記録がありません。</p>';
+  renderStockList();
+}
+function renderLawnChemicals(){
+  document.getElementById('lawnChemicalsGuide').innerHTML=LAWN_CHEMICALS.map(function(cat){
+    return '<div class="lawn-chem-category">'+cat.category+'</div>'+cat.items.map(function(d){
+      return '<div class="lawn-drug-card"><div class="lawn-drug-name">'+d.icon+' '+d.name+'</div><div class="lawn-drug-brand">'+d.brand+'</div><div class="lawn-drug-rows"><div class="lawn-drug-row"><div class="drug-row-label lbl-green">使用時期</div><div class="drug-row-val">'+d.timing+'</div></div><div class="lawn-drug-row"><div class="drug-row-label lbl-blue">使用量</div><div class="drug-row-val">'+d.usage+'</div></div></div>'+(d.caution?'<div class="drug-caution">⚠️ '+d.caution+'</div>':'')+'</div>';
+    }).join('');
+  }).join('');
+}
+function saveStock(){
+  var name=document.getElementById('stName').value.trim();
+  if(!name){alert('薬剤名を入力してください');return;}
+  stockList.unshift({id:Date.now().toString(),name:name,cat:document.getElementById('stCat').value,date:document.getElementById('stDate').value,amount:document.getElementById('stAmount').value.trim(),stock:document.getElementById('stStock').value.trim(),place:document.getElementById('stPlace').value.trim(),note:document.getElementById('stNote').value.trim()});
+  save('mrg_stock',stockList);['stName','stAmount','stStock','stPlace','stNote'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('stDate').value=toYMD(new Date());toggleForm('stockForm');renderStockList();
+}
+function renderStockList(){
+  var el=document.getElementById('stockList');if(!el)return;
+  el.innerHTML=stockList.length?stockList.map(function(s){
+    return '<div class="rec-card"><div class="rec-icon-wrap">📦</div><div class="rec-body"><div class="rec-meta"><span class="type-badge t-spray">'+s.cat+'</span><span class="rec-plant">'+s.name+'</span><span class="rec-date">'+(s.date||'')+'</span></div><div class="rec-note">'+[s.amount,s.stock,s.place].filter(Boolean).join(' / ')+'</div>'+(s.note?'<div class="rec-next">📝 '+s.note+'</div>':'')+'</div><button class="del-btn" onclick="deleteStock(\''+s.id+'\')">🗑</button></div>';
+  }).join(''):'<p style="font-size:0.82rem;color:var(--bark);padding:10px">登録された薬剤・肥料はありません</p>';
+}
+function deleteStock(id){if(!confirm('削除しますか？'))return;stockList=stockList.filter(function(s){return s.id!==id;});save('mrg_stock',stockList);renderStockList();}
+function setFamilyFilter(f,el){familyFilter=f;document.querySelectorAll('#familyFilterBar .chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');renderFamilyGrid();}
+function saveFamilyPhoto(){
+  var who=document.getElementById('fWho').value,date=document.getElementById('fDate').value,comment=document.getElementById('fComment').value.trim(),photoFile=document.getElementById('fPhoto').files[0];
+  if(!photoFile){alert('写真を選んでください');return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    familyPhotos.unshift({id:Date.now().toString(),who:who,date:date,comment:comment,photo:e.target.result});
+    save('mrg_family',familyPhotos);document.getElementById('fComment').value='';document.getElementById('fPhoto').value='';document.getElementById('fDate').value=toYMD(new Date());toggleForm('familyForm');renderFamilyGrid();
+  };
+  reader.readAsDataURL(photoFile);
+}
+function deleteFamilyPhoto(id){if(!confirm('削除しますか？'))return;familyPhotos=familyPhotos.filter(function(p){return p.id!==id;});save('mrg_family',familyPhotos);renderFamilyGrid();}
+function renderFamilyGrid(){
+  var filtered=familyFilter==='all'?familyPhotos:familyPhotos.filter(function(p){return p.who===familyFilter;});
+  var sorted=filtered.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  document.getElementById('familyPhotoGrid').innerHTML=sorted.length?sorted.map(function(p){
+    var d=new Date(p.date+'T00:00:00'),dl=d.toLocaleDateString('ja-JP',{year:'numeric',month:'numeric',day:'numeric'});
+    return '<div class="photo-item"><img src="'+p.photo+'" alt="'+p.who+'" onclick="openLightbox(\''+p.photo+'\')"><div class="photo-item-info"><div class="photo-who">'+(WHO_ICON[p.who]||'🐾')+' '+p.who+'<button class="photo-del" onclick="deleteFamilyPhoto(\''+p.id+'\')">🗑</button></div>'+(p.comment?'<div class="photo-comment">'+p.comment+'</div>':'')+'<div class="photo-date">'+dl+'</div></div></div>';
+  }).join(''):'<div class="no-photo">写真がまだありません。<br>「＋ 写真を追加」から追加してみてください🐾</div>';
+}
+function renderGuide(){
+  document.getElementById('guideGrid').innerHTML=GUIDE_PLANTS.map(function(p){
+    return '<div class="guide-card"><div class="guide-header"><div class="guide-emoji">'+p.emoji+'</div><div><div class="guide-name">'+p.name+'</div><div class="guide-cat">'+p.cat+'</div></div></div><div class="gr"><span class="enc-label" style="background:var(--moss)">種まき</span><span>'+p.seed+'</span></div><div class="gr"><span class="enc-label" style="background:var(--harvest)">植付け</span><span>'+p.plant+'</span></div><div class="gr"><span class="enc-label" style="background:var(--sky)">収穫</span><span>'+p.harvest+'</span></div><div class="gr"><span class="enc-label" style="background:var(--bark)">施肥</span><span>'+p.fertilize+'</span></div><div class="gr"><span class="enc-label" style="background:#7a5c44">ポイント</span><span>'+p.note+'</span></div></div>';
+  }).join('');
+}
+function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+init();
+</script>
+
+</body>
+</html>
